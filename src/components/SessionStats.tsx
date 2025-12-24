@@ -24,7 +24,7 @@ export const SessionStats: React.FC<SessionStatsProps> = ({ stats }) => {
       <div className="grid grid-cols-3 gap-4">
         <div className="text-center">
           <p className="text-2xl md:text-3xl font-bold text-cleanup-secondary font-display">
-            {stats.totalSolPrinted.toFixed(4)}
+            {stats.totalSolReclaimed.toFixed(4)}
           </p>
           <p className="text-xs text-cleanup-text-muted mt-1">SOL Reclaimed</p>
         </div>
@@ -38,7 +38,7 @@ export const SessionStats: React.FC<SessionStatsProps> = ({ stats }) => {
         
         <div className="text-center">
           <p className="text-2xl md:text-3xl font-bold text-cleanup-primary font-display">
-            {stats.printCount}
+            {stats.reclaimCount}
           </p>
           <p className="text-xs text-cleanup-text-muted mt-1">Transactions</p>
         </div>

@@ -1,7 +1,7 @@
 /**
  * usePumpCleanup Hook
  * 
- * Handles the "PRINT" operation - closing token accounts and reclaiming rent.
+ * Handles the reclaim operation - closing token accounts and reclaiming rent.
  * This hook manages:
  * - Transaction building and batching
  * - Wallet signing flow
@@ -9,7 +9,7 @@
  * - Fee calculation and transfer
  * - Session statistics
  * 
- * The printing process:
+ * The reclaim process:
  * 1. Build transactions to close accounts (batched for efficiency)
  * 2. Add fee transfer transaction (if fee recipient is configured)
  * 3. Request wallet signature for each transaction
@@ -37,7 +37,7 @@ import {
 // TYPES
 // ============================================================================
 
-export type PrintStatus =
+export type ReclaimStatus =
   | 'idle'
   | 'preparing'
   | 'awaiting_signature'
@@ -47,9 +47,9 @@ export type PrintStatus =
   | 'error'
   | 'partial_success';
 
-export interface PrintProgress {
-  /** Current status of the print operation */
-  status: PrintStatus;
+export interface ReclaimProgress {
+  /** Current status of the reclaim operation */
+  status: ReclaimStatus;
   /** Human-readable message about current status */
   message: string;
   /** Current transaction number (1-indexed) */
@@ -60,7 +60,7 @@ export interface PrintProgress {
   percentage: number;
 }
 
-export interface PrintResult {
+export interface ReclaimResult {
   /** Whether the operation succeeded */
   success: boolean;
   /** Number of accounts successfully closed */
@@ -80,26 +80,26 @@ export interface PrintResult {
 }
 
 export interface SessionStats {
-  /** Total SOL printed this session */
-  totalSolPrinted: number;
+  /** Total SOL reclaimed this session */
+  totalSolReclaimed: number;
   /** Total accounts closed this session */
   totalAccountsClosed: number;
-  /** Number of successful print operations */
-  printCount: number;
+  /** Number of successful reclaim operations */
+  reclaimCount: number;
 }
 
 export interface UsePumpCleanupReturn {
-  /** Execute the print operation */
-  print: (accounts: CloseableAccount[], customDestination?: string) => Promise<PrintResult | null>;
-  /** Current progress of the print operation */
-  progress: PrintProgress;
-  /** Whether a print is in progress */
-  isPrinting: boolean;
-  /** Result of the last print operation */
-  lastResult: PrintResult | null;
+  /** Execute the reclaim operation */
+  reclaim: (accounts: CloseableAccount[], customDestination?: string) => Promise<ReclaimResult | null>;
+  /** Current progress of the reclaim operation */
+  progress: ReclaimProgress;
+  /** Whether a reclaim is in progress */
+  isReclaiming: boolean;
+  /** Result of the last reclaim operation */
+  lastResult: ReclaimResult | null;
   /** Session statistics */
   sessionStats: SessionStats;
-  /** Reset the printer state */
+  /** Reset the state */
   reset: () => void;
   /** Fee percentage as a number (0-1) */
   feePercentage: number;
@@ -113,7 +113,7 @@ export interface UsePumpCleanupReturn {
 // INITIAL STATES
 // ============================================================================
 
-const initialProgress: PrintProgress = {
+const initialProgress: ReclaimProgress = {
   status: 'idle',
   message: '',
   currentTx: 0,
@@ -122,9 +122,9 @@ const initialProgress: PrintProgress = {
 };
 
 const initialStats: SessionStats = {
-  totalSolPrinted: 0,
+  totalSolReclaimed: 0,
   totalAccountsClosed: 0,
-  printCount: 0,
+  reclaimCount: 0,
 };
 
 // ============================================================================
@@ -135,8 +135,8 @@ export function usePumpCleanup(): UsePumpCleanupReturn {
   const { publicKey, signAllTransactions, signTransaction } = useWallet();
   const { connection } = useConnection();
 
-  const [progress, setProgress] = useState<PrintProgress>(initialProgress);
-  const [lastResult, setLastResult] = useState<PrintResult | null>(null);
+  const [progress, setProgress] = useState<ReclaimProgress>(initialProgress);
+  const [lastResult, setLastResult] = useState<ReclaimResult | null>(null);
   const [sessionStats, setSessionStats] = useState<SessionStats>(initialStats);
 
   // Parse fee recipient once
@@ -153,12 +153,12 @@ export function usePumpCleanup(): UsePumpCleanupReturn {
   /**
    * Updates progress state with a delay for visual feedback.
    */
-  const updateProgress = useCallback((update: Partial<PrintProgress>) => {
+  const updateProgress = useCallback((update: Partial<ReclaimProgress>) => {
     setProgress(prev => ({ ...prev, ...update }));
   }, []);
 
   /**
-   * Executes the print operation - closes accounts and reclaims rent.
+   * Executes the reclaim operation - closes accounts and reclaims rent.
    * 
    * Flow:
    * 1. Validate wallet and accounts
@@ -168,8 +168,8 @@ export function usePumpCleanup(): UsePumpCleanupReturn {
    * 5. Submit each transaction sequentially
    * 6. Track results and update stats
    */
-  const print = useCallback(
-    async (accounts: CloseableAccount[], customDestination?: string): Promise<PrintResult | null> => {
+  const reclaim = useCallback(
+    async (accounts: CloseableAccount[], customDestination?: string): Promise<ReclaimResult | null> => {
       // Parse custom destination if provided
       let destinationPubkey: PublicKey | undefined;
       if (customDestination) {
@@ -410,7 +410,7 @@ export function usePumpCleanup(): UsePumpCleanupReturn {
 
         if (!hasConfirmedTransactions) {
           // Complete failure - no transactions confirmed
-          const result: PrintResult = {
+          const result: ReclaimResult = {
             success: false,
             accountsClosed: 0,
             lamportsReclaimed: 0,
@@ -432,7 +432,7 @@ export function usePumpCleanup(): UsePumpCleanupReturn {
         }
 
         // At least some transactions succeeded
-        const result: PrintResult = {
+        const result: ReclaimResult = {
           success: allSucceeded,
           accountsClosed: actualAccountsClosed,
           lamportsReclaimed: actualLamports,
@@ -448,9 +448,9 @@ export function usePumpCleanup(): UsePumpCleanupReturn {
         // Update session stats only for actual success
         if (actualAccountsClosed > 0) {
         setSessionStats(prev => ({
-            totalSolPrinted: prev.totalSolPrinted + actualUserSol,
+            totalSolReclaimed: prev.totalSolReclaimed + actualUserSol,
             totalAccountsClosed: prev.totalAccountsClosed + actualAccountsClosed,
-          printCount: prev.printCount + 1,
+          reclaimCount: prev.reclaimCount + 1,
         }));
         }
 
@@ -458,16 +458,16 @@ export function usePumpCleanup(): UsePumpCleanupReturn {
           status: partialSuccess ? 'partial_success' : 'success',
           message: partialSuccess 
             ? `Partial success: ${actualAccountsClosed} accounts closed, ${failedTransactions} failed`
-            : `Success! Printed ${actualUserSol.toFixed(4)} SOL`,
+            : `Success! Reclaimed ${actualUserSol.toFixed(4)} SOL`,
           currentTx: signedTransactions.length,
           percentage: 100,
         });
 
         return result;
       } catch (error: any) {
-        console.error('Print operation failed:', error);
+        console.error('Reclaim operation failed:', error);
 
-        const result: PrintResult = {
+        const result: ReclaimResult = {
           success: false,
           accountsClosed: 0,
           lamportsReclaimed: 0,
@@ -492,7 +492,7 @@ export function usePumpCleanup(): UsePumpCleanupReturn {
   );
 
   /**
-   * Resets the printer state to initial values.
+   * Resets the state to initial values.
    */
   const reset = useCallback(() => {
     setProgress(initialProgress);
@@ -506,15 +506,15 @@ export function usePumpCleanup(): UsePumpCleanupReturn {
     return getExplorerUrl(signature, 'tx', SOLANA_NETWORK);
   }, []);
 
-  const isPrinting = progress.status !== 'idle' && 
+  const isReclaiming = progress.status !== 'idle' && 
                      progress.status !== 'success' && 
                      progress.status !== 'error' &&
                      progress.status !== 'partial_success';
 
   return {
-    print,
+    reclaim,
     progress,
-    isPrinting,
+    isReclaiming,
     lastResult,
     sessionStats,
     reset,
@@ -525,4 +525,3 @@ export function usePumpCleanup(): UsePumpCleanupReturn {
 }
 
 export default usePumpCleanup;
-

@@ -208,7 +208,7 @@ export const HeroSection: React.FC = () => {
                       <p className="text-cleanup-text-muted text-xs mb-2">
                         {scanResult.isTruncated ? `Showing ${accountCount} of ${scanResult.totalCloseableCount}` : `${accountCount} closeable accounts`}:
                       </p>
-                      {scanResult.closeableAccounts.filter(a => !a.isDust).slice(0, 20).map((account) => (
+                      {scanResult.closeableAccounts.slice(0, 20).map((account) => (
                         <div 
                           key={account.address.toBase58()} 
                           className="flex items-center justify-between text-sm py-2 px-3 bg-cleanup-dark/50 rounded-lg"

@@ -27,7 +27,7 @@ let cacheTimestamp: number = 0;
 let fetchPromise: Promise<PayoutEntry[]> | null = null;
 const CACHE_TTL = 10 * 60 * 1000;
 
-export function getCachedTotalSolPrinted(): number {
+export function getCachedTotalSolReclaimed(): number {
   if (!cachedPayouts) return 0;
   return cachedPayouts.reduce((sum, p) => sum + (p.reward * 10 / 9), 0);
 }
@@ -205,7 +205,7 @@ export const RecentPayouts: React.FC = () => {
     console.error('RecentPayouts error:', error);
   }
 
-  const totalSolPrinted = payouts.reduce((sum, p) => sum + (p.reward * 10 / 9), 0);
+  const totalSolReclaimed = payouts.reduce((sum, p) => sum + (p.reward * 10 / 9), 0);
 
   return (
     <section className="w-full max-w-4xl mx-auto px-4 py-8">
@@ -216,7 +216,7 @@ export const RecentPayouts: React.FC = () => {
         {payouts.length > 0 && (
           <div className="bg-cleanup-secondary/10 border border-cleanup-secondary/20 rounded-lg px-4 py-2">
             <span className="text-xs text-cleanup-text-secondary">Total Reclaimed: </span>
-            <span className="text-cleanup-secondary font-bold">{totalSolPrinted.toFixed(4)} SOL</span>
+            <span className="text-cleanup-secondary font-bold">{totalSolReclaimed.toFixed(4)} SOL</span>
           </div>
         )}
       </div>

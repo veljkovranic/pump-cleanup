@@ -5,13 +5,13 @@
  * Closes empty token accounts to reclaim SOL.
  */
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { shortenAddress } from '@/lib/solana';
 import { useWalletRentScanner, usePumpCleanup } from '@/hooks';
 import { FEE_PERCENTAGE } from '@/lib/constants';
 import AccountsList from './AccountsList';
-import PrintButton from './PrintButton';
+import ReclaimButton from './ReclaimButton';
 import ProgressIndicator from './ProgressIndicator';
 import SessionStats from './SessionStats';
 import Confetti from './Confetti';
@@ -41,20 +41,18 @@ export const ScannerPanel: React.FC = () => {
   } = useWalletRentScanner();
 
   const {
-    print,
+    reclaim,
     progress,
-    isPrinting,
+    isReclaiming,
     lastResult,
     sessionStats,
-    reset: resetPrinter,
+    reset: resetReclaimer,
     feeEnabled,
     getExplorerLink,
   } = usePumpCleanup();
 
-  // Filter to only show empty accounts (no dust/burn)
-  const emptyAccounts = useMemo(() => {
-    return closeableAccounts.filter(a => !a.isDust);
-  }, [closeableAccounts]);
+  // All closeable accounts are empty (no balance)
+  const emptyAccounts = closeableAccounts;
 
   // Calculate totals
   const emptyTotalSol = emptyAccounts.reduce((sum, a) => sum + a.rentSol, 0);
@@ -66,13 +64,13 @@ export const ScannerPanel: React.FC = () => {
     if (currentAddress && lastWalletAddress.current && currentAddress !== lastWalletAddress.current) {
       console.log('Wallet changed from', lastWalletAddress.current, 'to', currentAddress);
       resetScanner();
-      resetPrinter();
+      resetReclaimer();
       setSelectedAccounts(new Set());
       setTimeout(() => scan(), 100);
     }
     
     lastWalletAddress.current = currentAddress;
-  }, [publicKey, resetScanner, resetPrinter, scan]);
+  }, [publicKey, resetScanner, resetReclaimer, scan]);
 
   // Fetch SOL balance when wallet connects
   useEffect(() => {
@@ -140,9 +138,9 @@ export const ScannerPanel: React.FC = () => {
     setSelectedAccounts(new Set());
   }, []);
 
-  const handlePrint = async () => {
+  const handleReclaim = async () => {
     if (selectedAccountsList.length > 0) {
-      const result = await print(selectedAccountsList);
+      const result = await reclaim(selectedAccountsList);
       
       if (result?.error === 'cancelled') {
         showToast('Transaction cancelled');
@@ -157,7 +155,7 @@ export const ScannerPanel: React.FC = () => {
   };
 
   const handleNewScan = () => {
-    resetPrinter();
+    resetReclaimer();
     scan();
   };
 
@@ -177,7 +175,7 @@ export const ScannerPanel: React.FC = () => {
     <section className={`w-full max-w-4xl mx-auto px-4 ${showSuccessScreen ? 'flex-1 flex flex-col justify-center' : 'py-8'}`}>
       <Confetti show={showConfetti} />
 
-      {isPrinting && <ProgressIndicator progress={progress} />}
+      {isReclaiming && <ProgressIndicator progress={progress} />}
 
       {/* Success Result */}
       {showSuccessScreen && (
@@ -254,7 +252,7 @@ export const ScannerPanel: React.FC = () => {
       <Toast show={toast.show} message={toast.message} onHide={hideToast} type="info" duration={2500} />
 
       {/* Main Scan/Results Area */}
-      {!isPrinting && progress.status !== 'success' && progress.status !== 'partial_success' && progress.status !== 'error' && (
+      {!isReclaiming && progress.status !== 'success' && progress.status !== 'partial_success' && progress.status !== 'error' && (
         <>
           {/* Scan Button */}
           {!hasScanned && (
@@ -337,10 +335,10 @@ export const ScannerPanel: React.FC = () => {
 
                     {/* Action Button */}
                     <div className="p-5 border-t border-cleanup-border">
-                      <PrintButton
-                        onClick={handlePrint}
-                        disabled={isPrinting || selectedAccounts.size === 0 || !hasEnoughSol}
-                        isLoading={isPrinting}
+                      <ReclaimButton
+                        onClick={handleReclaim}
+                        disabled={isReclaiming || selectedAccounts.size === 0 || !hasEnoughSol}
+                        isLoading={isReclaiming}
                         solAmount={userReceives}
                       />
                     </div>
@@ -369,7 +367,7 @@ export const ScannerPanel: React.FC = () => {
         </>
       )}
 
-      {(sessionStats.printCount > 0 || sessionStats.totalAccountsClosed > 0) && (
+      {(sessionStats.reclaimCount > 0 || sessionStats.totalAccountsClosed > 0) && (
         <SessionStats stats={sessionStats} />
       )}
     </section>

@@ -31,26 +31,6 @@ export const RPC_ENDPOINT =
   process.env.NEXT_PUBLIC_RPC_ENDPOINT || clusterApiUrl(SOLANA_NETWORK);
 
 // ============================================================================
-// BURN ADDRESS CONFIGURATION
-// ============================================================================
-
-/**
- * Address where dust tokens are transferred before closing accounts.
- * This should be a valid Solana address that you control or a known burn address.
- * 
- * Using transfer (instead of burn instruction) works better for some tokens
- * that have restricted burn capabilities.
- * 
- * Set to empty string to use burn instruction instead of transfer.
- */
-export const BURN_ADDRESS = process.env.NEXT_PUBLIC_BURN_ADDRESS || '';
-
-/**
- * Whether to use transfer-to-burn-address instead of burn instruction.
- */
-export const USE_BURN_ADDRESS = BURN_ADDRESS !== '';
-
-// ============================================================================
 // FEE CONFIGURATION
 // ============================================================================
 

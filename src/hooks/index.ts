@@ -9,9 +9,9 @@ export type { ScanState, UseWalletRentScannerReturn } from './useWalletRentScann
 
 export { usePumpCleanup } from './usePumpCleanup';
 export type {
-  PrintStatus,
-  PrintProgress,
-  PrintResult,
+  ReclaimStatus,
+  ReclaimProgress,
+  ReclaimResult,
   SessionStats,
   UsePumpCleanupReturn,
 } from './usePumpCleanup';

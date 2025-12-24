@@ -14,7 +14,6 @@ import {
   Connection,
   PublicKey,
   Transaction,
-  TransactionInstruction,
   SystemProgram,
   LAMPORTS_PER_SOL,
   ComputeBudgetProgram,
@@ -22,16 +21,9 @@ import {
 import {
   TOKEN_PROGRAM_ID,
   TOKEN_2022_PROGRAM_ID,
-  getAccount,
   createCloseAccountInstruction,
-  createBurnInstruction,
-  createTransferInstruction,
-  getAssociatedTokenAddressSync,
-  createAssociatedTokenAccountIdempotentInstruction,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  AccountState,
 } from '@solana/spl-token';
-import { RPC_ENDPOINT, MAX_ACCOUNTS_PER_TX, BURN_ADDRESS, USE_BURN_ADDRESS } from './constants';
+import { RPC_ENDPOINT, MAX_ACCOUNTS_PER_TX } from './constants';
 
 // ============================================================================
 // CONNECTION SINGLETON
@@ -71,14 +63,6 @@ export interface CloseableAccount {
   rentSol: number;
   /** The token program this account belongs to (TOKEN_PROGRAM_ID or TOKEN_2022_PROGRAM_ID) */
   programId: PublicKey;
-  /** Whether this is a dust token (has small balance that needs burning) */
-  isDust: boolean;
-  /** Token balance (for dust tokens) */
-  tokenBalance: string;
-  /** UI amount (for dust tokens) */
-  uiAmount: number;
-  /** Token decimals */
-  decimals: number;
   /** Is this a pump.fun token */
   isPumpToken: boolean;
 }
@@ -111,9 +95,9 @@ export interface ScanResult {
 const MAX_ACCOUNTS_TO_PROCESS = 100;
 
 /**
- * Result of a print (close accounts) operation.
+ * Result of a reclaim (close accounts) operation.
  */
-export interface PrintResult {
+export interface ReclaimResult {
   /** Whether the operation succeeded */
   success: boolean;
   /** Number of accounts successfully closed */
@@ -166,6 +150,7 @@ async function tryDASTokenAccounts(walletAddress: string): Promise<any[] | null>
  * Scans a wallet for closeable token accounts.
  * 
  * OPTIMIZED: Tries DAS API first (1 call), falls back to standard RPC (2 parallel calls).
+ * Only returns empty accounts (zero balance) that can be safely closed.
  * 
  * @param walletAddress - The wallet public key to scan
  * @returns ScanResult with closeable accounts and totals
@@ -238,7 +223,6 @@ export async function scanWalletForCloseableAccounts(
 
       const uiAmount = tokenAmount.uiAmount || 0;
       const rawAmount = tokenAmount.amount || '0';
-      const decimals = tokenAmount.decimals || 0;
       const isPumpToken = mintAddress.toLowerCase().endsWith('pump');
 
       // Skip frozen accounts
@@ -247,10 +231,10 @@ export async function scanWalletForCloseableAccounts(
         continue;
       }
 
+      // Only include empty accounts (zero balance)
       const isEmpty = uiAmount === 0 || rawAmount === '0';
-      const isDust = !isEmpty;
       
-      if (!isEmpty && !isDust) {
+      if (!isEmpty) {
         skippedAccounts++;
         continue;
       }
@@ -264,10 +248,6 @@ export async function scanWalletForCloseableAccounts(
         rentLamports,
         rentSol,
         programId,
-        isDust,
-        tokenBalance: rawAmount,
-        uiAmount,
-        decimals,
         isPumpToken,
       });
     } catch (error) {
@@ -275,11 +255,8 @@ export async function scanWalletForCloseableAccounts(
     }
   }
 
-  // Sort: empty first, then dust, then by rent amount
-  closeableAccounts.sort((a, b) => {
-    if (a.isDust === b.isDust) return b.rentLamports - a.rentLamports;
-    return a.isDust ? 1 : -1;
-  });
+  // Sort by rent amount (highest first)
+  closeableAccounts.sort((a, b) => b.rentLamports - a.rentLamports);
 
   const totalCloseableCount = closeableAccounts.length;
   const isTruncated = closeableAccounts.length > MAX_ACCOUNTS_TO_PROCESS;
@@ -297,18 +274,14 @@ export async function scanWalletForCloseableAccounts(
     (sum, acc) => sum + acc.rentLamports,
     0
   );
-  
-  const emptyCount = truncatedAccounts.filter(a => !a.isDust).length;
-  const dustCount = truncatedAccounts.filter(a => a.isDust).length;
 
   console.log(`\n`);
   console.log(`%c[PumpCleanup] ═══════════════════════════════════════`, 'color: #00ff88; font-weight: bold');
   console.log(`%c[PumpCleanup] 📊 SCAN COMPLETE`, 'color: #00ff88; font-weight: bold');
   console.log(`[PumpCleanup] Total accounts scanned: ${totalAccountsFound}`);
   console.log(`[PumpCleanup] Closeable found: ${totalCloseableCount}${isTruncated ? ` (showing ${MAX_ACCOUNTS_TO_PROCESS})` : ''}`);
-  console.log(`[PumpCleanup] Empty: ${emptyCount} | Dust: ${dustCount}`);
   console.log(`%c[PumpCleanup] Frozen: ${frozenAccounts}`, 'color: #3b82f6');
-  console.log(`[PumpCleanup] Skipped: ${skippedAccounts}`);
+  console.log(`[PumpCleanup] Skipped (non-empty): ${skippedAccounts}`);
   console.log(`[PumpCleanup] Total reclaimable: ${estimatedTotalSol.toFixed(4)} SOL`);
   if (isTruncated) {
     console.log(`%c[PumpCleanup] ⚠️ Results truncated to ${MAX_ACCOUNTS_TO_PROCESS} for performance`, 'color: #ff6b00');
@@ -338,7 +311,7 @@ export async function scanWalletForCloseableAccounts(
  * Batches close instructions into multiple transactions to avoid
  * exceeding compute limits.
  * 
- * @param accounts - Array of accounts to close
+ * @param accounts - Array of accounts to close (must be empty)
  * @param owner - The wallet that owns these accounts (signs the tx)
  * @param feeRecipient - Optional fee recipient address
  * @param feePercentage - Optional fee percentage (0-1)
@@ -368,8 +341,7 @@ export async function createCloseAccountTransactions(
     transaction.lastValidBlockHeight = lastValidBlockHeight;
     transaction.feePayer = owner;
 
-    // Add compute budget instructions (like competitor does)
-    // Limit compute units and set priority fee for faster processing
+    // Add compute budget instructions for priority processing
     transaction.add(
       ComputeBudgetProgram.setComputeUnitLimit({
         units: 100000, // 100k units should be enough for batch operations
@@ -381,55 +353,8 @@ export async function createCloseAccountTransactions(
       })
     );
 
-    // Add instructions for each account in this batch
-    const burnAddressPubkey = USE_BURN_ADDRESS ? new PublicKey(BURN_ADDRESS) : null;
-    
+    // Add close instruction for each account in this batch
     for (const account of batch) {
-      // If this is a dust token (has balance), we need to clear it first
-      if (account.isDust && account.tokenBalance !== '0') {
-        if (burnAddressPubkey) {
-          // MODE 1: Transfer tokens to burn address
-          const burnAta = getAssociatedTokenAddressSync(
-            account.mint,
-            burnAddressPubkey,
-            true, // allowOwnerOffCurve
-            account.programId,
-            ASSOCIATED_TOKEN_PROGRAM_ID
-          );
-          
-          // Create ATA for burn address if needed (idempotent)
-          transaction.add(createAssociatedTokenAccountIdempotentInstruction(
-            owner,
-            burnAta,
-            burnAddressPubkey,
-            account.mint,
-            account.programId,
-            ASSOCIATED_TOKEN_PROGRAM_ID
-          ));
-          
-          // Transfer all tokens to burn address
-          transaction.add(createTransferInstruction(
-            account.address,
-            burnAta,
-            owner,
-            BigInt(account.tokenBalance),
-            [],
-            account.programId
-          ));
-        } else {
-          // MODE 2: Use burn instruction (destroys tokens)
-          transaction.add(createBurnInstruction(
-            account.address,
-            account.mint,
-            owner,
-            BigInt(account.tokenBalance),
-            [],
-            account.programId
-          ));
-        }
-      }
-
-      // Then close the account to reclaim rent
       const closeInstruction = createCloseAccountInstruction(
         account.address,
         rentDestination,
@@ -441,7 +366,6 @@ export async function createCloseAccountTransactions(
     }
 
     // If fee collection is enabled, add fee transfer to THIS transaction
-    // This way burn + close + fee all happen in ONE transaction/signature
     if (feeRecipient && feePercentage > 0) {
       const batchLamports = batch.reduce((sum, acc) => sum + acc.rentLamports, 0);
       const feeLamports = Math.floor(batchLamports * feePercentage);
@@ -506,4 +430,3 @@ export function getExplorerUrl(
   const cluster = network === 'mainnet-beta' ? '' : `?cluster=${network}`;
   return `https://explorer.solana.com/${type}/${signature}${cluster}`;
 }
-

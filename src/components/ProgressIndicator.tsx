@@ -5,10 +5,10 @@
  */
 
 import React from 'react';
-import { PrintProgress } from '@/hooks/usePumpCleanup';
+import { ReclaimProgress } from '@/hooks/usePumpCleanup';
 
 interface ProgressIndicatorProps {
-  progress: PrintProgress;
+  progress: ReclaimProgress;
 }
 
 export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ progress }) => {

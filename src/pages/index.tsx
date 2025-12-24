@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Header, HeroSection, ScannerPanel, Footer, RecentPayouts } from '@/components';
-import { getCachedTotalSolPrinted } from '@/components/RecentPayouts';
+import { getCachedTotalSolReclaimed } from '@/components/RecentPayouts';
 import { faqs } from './faq';
 
 export default function Home() {
@@ -84,7 +84,7 @@ const StatsSection: React.FC = () => {
   const [totalSol, setTotalSol] = useState(0);
 
   useEffect(() => {
-    const updateTotal = () => setTotalSol(getCachedTotalSolPrinted());
+    const updateTotal = () => setTotalSol(getCachedTotalSolReclaimed());
     updateTotal();
     const interval = setInterval(updateTotal, 2000);
     return () => clearInterval(interval);
