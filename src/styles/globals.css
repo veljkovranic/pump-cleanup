@@ -1,0 +1,304 @@
+/**
+ * Wallet Cleanup Global Styles
+ * 
+ * Professional, clean design inspired by rpcfast.com
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   FONT IMPORTS
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ============================================================================
+   BASE STYLES
+   ============================================================================ */
+
+:root {
+  --cleanup-primary: #4f8fff;
+  --cleanup-secondary: #00d4aa;
+  --cleanup-dark: #0a0b0f;
+  --cleanup-card: #0f1015;
+  --cleanup-border: #1a1b23;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #0a0b0f;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f1015;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a1b23;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #22242e;
+}
+
+/* ============================================================================
+   TYPOGRAPHY
+   ============================================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-weight: 700;
+}
+
+/* ============================================================================
+   CUSTOM ANIMATIONS
+   ============================================================================ */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px);
+    opacity: 1;
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 3s ease infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(var(--drift, 0)) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+/* ============================================================================
+   WALLET ADAPTER OVERRIDES
+   ============================================================================ */
+
+.wallet-adapter-modal-wrapper {
+  background-color: rgba(10, 11, 15, 0.95) !important;
+  backdrop-filter: blur(20px);
+}
+
+.wallet-adapter-modal-container {
+  background-color: #0f1015 !important;
+  border: 1px solid #1a1b23 !important;
+  border-radius: 16px !important;
+}
+
+.wallet-adapter-modal-title {
+  color: #fff !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 600 !important;
+}
+
+.wallet-adapter-modal-list {
+  margin: 0 !important;
+}
+
+.wallet-adapter-modal-list li {
+  background-color: #0a0b0f !important;
+  border: 1px solid #1a1b23 !important;
+  margin-bottom: 8px !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.wallet-adapter-modal-list li:hover {
+  background-color: #1a1b23 !important;
+  border-color: #4f8fff !important;
+}
+
+.wallet-adapter-button {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button {
+  color: #fff !important;
+}
+
+.wallet-adapter-modal-button-close {
+  background-color: #1a1b23 !important;
+  transition: all 0.2s ease !important;
+}
+
+.wallet-adapter-modal-button-close:hover {
+  background-color: #22242e !important;
+}
+
+.wallet-adapter-dropdown-list {
+  background-color: #0f1015 !important;
+  border: 1px solid #1a1b23 !important;
+  border-radius: 12px !important;
+  padding: 8px !important;
+}
+
+.wallet-adapter-dropdown-list-item {
+  border-radius: 8px !important;
+  font-family: 'Inter', sans-serif !important;
+  transition: all 0.2s ease !important;
+}
+
+.wallet-adapter-dropdown-list-item:hover {
+  background-color: #1a1b23 !important;
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+/* Glow effects */
+.glow-primary {
+  box-shadow: 0 0 30px rgba(79, 143, 255, 0.3);
+}
+
+.glow-primary-strong {
+  box-shadow: 0 0 50px rgba(79, 143, 255, 0.5);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 30px rgba(0, 212, 170, 0.3);
+}
+
+/* Text glow */
+.text-glow-primary {
+  text-shadow: 0 0 20px rgba(79, 143, 255, 0.5);
+}
+
+/* Glassmorphism effect */
+.glass {
+  background: rgba(15, 16, 21, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(26, 27, 35, 0.8);
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  border-color: #4f8fff;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Button styles */
+.btn-primary {
+  background: linear-gradient(135deg, #4f8fff 0%, #00d4aa 100%);
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(79, 143, 255, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid #1a1b23;
+  color: white;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  border-color: #4f8fff;
+  background: rgba(79, 143, 255, 0.1);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #4f8fff 0%, #00d4aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  .wallet-adapter-button {
+    font-size: 13px !important;
+    padding: 10px 16px !important;
+  }
+  
+  .wallet-adapter-modal-container {
+    margin: 16px !important;
+    max-height: calc(100vh - 32px) !important;
+  }
+}
