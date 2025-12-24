@@ -27,15 +27,15 @@ export default function Document() {
         <meta name="theme-color" content="#4f8fff" />
         
         {/* Open Graph */}
-        <meta property="og:title" content="Wallet Cleanup - Reclaim SOL" />
+        <meta property="og:title" content="PumpCleanup - Reclaim SOL" />
         <meta property="og:description" content="Reclaim hidden SOL locked in empty token accounts on Solana. Clean your wallet instantly." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://walletcleanup.com" />
+        <meta property="og:url" content="https://pumpcleanup.com" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@wallet_cleanup" />
-        <meta name="twitter:title" content="Wallet Cleanup - Reclaim SOL" />
+        <meta name="twitter:site" content="@pumpcleanup" />
+        <meta name="twitter:title" content="PumpCleanup - Reclaim SOL" />
         <meta name="twitter:description" content="Reclaim hidden SOL locked in empty token accounts on Solana." />
         
         {/* Microsoft Clarity */}

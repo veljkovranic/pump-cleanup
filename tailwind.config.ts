@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Wallet Cleanup - Professional theme inspired by rpcfast.com
+        // PumpCleanup - Professional theme inspired by rpcfast.com
         cleanup: {
           dark: '#0a0b0f',
           darker: '#050507',

@@ -1,5 +1,5 @@
 /**
- * DegenPrinter Configuration Constants
+ * PumpCleanup Configuration Constants
  * 
  * These values are read from environment variables with sensible defaults.
  * For production, configure these via your .env file or hosting provider.

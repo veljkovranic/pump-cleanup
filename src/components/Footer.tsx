@@ -1,7 +1,7 @@
 /**
  * Footer Component
  * 
- * Professional footer for Wallet Cleanup.
+ * Professional footer for PumpCleanup.
  */
 
 import React from 'react';
@@ -17,10 +17,10 @@ export const Footer: React.FC = () => {
           <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img 
               src="/logo.svg" 
-              alt="Wallet Cleanup" 
+              alt="PumpCleanup" 
               className="w-8 h-8 rounded-lg"
             />
-            <span className="font-display font-semibold text-white">Wallet Cleanup</span>
+            <span className="font-display font-semibold text-white">PumpCleanup</span>
           </Link>
 
           {/* Network Status */}
@@ -46,7 +46,7 @@ export const Footer: React.FC = () => {
               FAQ
             </Link>
             <a
-              href="https://x.com/wallet_cleanup"
+              href="https://x.com/pumpcleanup"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white transition-colors flex items-center gap-1.5"
@@ -61,7 +61,7 @@ export const Footer: React.FC = () => {
 
         {/* Disclaimer */}
         <p className="mt-6 text-center text-xs text-cleanup-text-muted">
-          Wallet Cleanup is provided as-is. Always verify transactions before signing.
+          PumpCleanup is provided as-is. Always verify transactions before signing.
         </p>
       </div>
     </footer>

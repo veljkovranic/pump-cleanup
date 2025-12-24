@@ -1,10 +1,10 @@
-# Wallet Cleanup
+# PumpCleanup
 
 Reclaim hidden SOL locked in empty token accounts on Solana.
 
 ## Overview
 
-Every token transaction on Solana creates token accounts that lock ~0.002 SOL as rent. When you sell or transfer tokens, the empty accounts remain with your SOL still locked. Wallet Cleanup helps you close these accounts and recover your SOL.
+Every token transaction on Solana creates token accounts that lock ~0.002 SOL as rent. When you sell or transfer tokens, the empty accounts remain with your SOL still locked. PumpCleanup helps you close these accounts and recover your SOL.
 
 ## Features
 

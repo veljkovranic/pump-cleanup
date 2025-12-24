@@ -8,7 +8,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { shortenAddress } from '@/lib/solana';
-import { useWalletRentScanner, useDegenPrinter } from '@/hooks';
+import { useWalletRentScanner, usePumpCleanup } from '@/hooks';
 import { FEE_PERCENTAGE } from '@/lib/constants';
 import AccountsList from './AccountsList';
 import PrintButton from './PrintButton';
@@ -49,7 +49,7 @@ export const ScannerPanel: React.FC = () => {
     reset: resetPrinter,
     feeEnabled,
     getExplorerLink,
-  } = useDegenPrinter();
+  } = usePumpCleanup();
 
   // Filter to only show empty accounts (no dust/burn)
   const emptyAccounts = useMemo(() => {
@@ -215,7 +215,7 @@ export const ScannerPanel: React.FC = () => {
           )}
 
           <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just recovered ${(lastResult?.solKept ?? 0).toFixed(4)} SOL with @wallet_cleanup 🧹✨\n\nClean wallet, recovered SOL! Try it yourself 👇`)}&url=${encodeURIComponent('https://walletcleanup.com')}`}
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just recovered ${(lastResult?.solKept ?? 0).toFixed(4)} SOL with @pumpcleanup 🧹✨\n\nClean wallet, recovered SOL! Try it yourself 👇`)}&url=${encodeURIComponent('https://pumpcleanup.com')}`}
             target="_blank" rel="noopener noreferrer"
             className="mt-6 w-full py-4 bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
           >

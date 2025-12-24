@@ -23,7 +23,7 @@ export default function BlogIndex() {
   return (
     <>
       <Head>
-        <title>Blog - Wallet Cleanup</title>
+        <title>Blog - PumpCleanup</title>
         <meta name="description" content="Learn about Solana, token accounts, rent, and how to optimize your wallet." />
       </Head>
 
@@ -34,11 +34,11 @@ export default function BlogIndex() {
             <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all">
               <img 
                 src="/logo.svg" 
-                alt="Wallet Cleanup" 
+                alt="PumpCleanup" 
                 className="w-10 h-10 rounded-xl"
               />
               <span className="font-display text-xl font-bold text-white">
-                Wallet Cleanup
+                PumpCleanup
               </span>
             </Link>
             <nav className="flex items-center gap-6">
@@ -62,7 +62,7 @@ export default function BlogIndex() {
               Blog
             </h1>
             <p className="text-lg text-cleanup-text-secondary max-w-2xl mx-auto">
-              Learn about Solana, token accounts, wallet optimization, and the latest updates from Wallet Cleanup.
+              Learn about Solana, token accounts, wallet optimization, and the latest updates from PumpCleanup.
             </p>
           </div>
         </section>
@@ -121,7 +121,7 @@ export default function BlogIndex() {
         <footer className="py-8 px-4 border-t border-cleanup-border/50">
           <div className="max-w-6xl mx-auto text-center">
             <Link href="/" className="text-cleanup-text-secondary hover:text-white transition-colors text-sm">
-              ← Back to Wallet Cleanup
+              ← Back to PumpCleanup
             </Link>
           </div>
         </footer>

@@ -11,7 +11,7 @@ export default function BlogPost() {
   return (
     <>
       <Head>
-        <title>What is Solana Rent and Why Are You Paying It? - Wallet Cleanup</title>
+        <title>What is Solana Rent and Why Are You Paying It? - PumpCleanup</title>
         <meta name="description" content="Learn about Solana's rent mechanism, why token accounts lock your SOL, and how to reclaim it." />
         <meta property="og:title" content="What is Solana Rent and Why Are You Paying It?" />
         <meta property="og:description" content="Learn about Solana's rent mechanism and how to reclaim locked SOL." />
@@ -25,11 +25,11 @@ export default function BlogPost() {
             <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all">
               <img 
                 src="/logo.svg" 
-                alt="Wallet Cleanup" 
+                alt="PumpCleanup" 
                 className="w-10 h-10 rounded-xl"
               />
               <span className="font-display text-xl font-bold text-white">
-                Wallet Cleanup
+                PumpCleanup
               </span>
             </Link>
             <nav className="flex items-center gap-6">
@@ -152,7 +152,7 @@ export default function BlogPost() {
                   The good news: you can close these empty token accounts and get your SOL back. When you close an account, the rent-exempt SOL is returned to your wallet.
                 </p>
                 <p className="text-cleanup-text-secondary leading-relaxed mb-4">
-                  That&apos;s exactly what <Link href="/" className="text-cleanup-primary hover:underline">Wallet Cleanup</Link> does. It scans your wallet, identifies all closeable accounts, and lets you reclaim your SOL in just a few clicks.
+                  That&apos;s exactly what <Link href="/" className="text-cleanup-primary hover:underline">PumpCleanup</Link> does. It scans your wallet, identifies all closeable accounts, and lets you reclaim your SOL in just a few clicks.
                 </p>
               </section>
 
@@ -208,7 +208,7 @@ export default function BlogPost() {
         <footer className="py-8 px-4 border-t border-cleanup-border/50">
           <div className="max-w-6xl mx-auto text-center">
             <Link href="/" className="text-cleanup-text-secondary hover:text-white transition-colors text-sm">
-              ← Back to Wallet Cleanup
+              ← Back to PumpCleanup
             </Link>
           </div>
         </footer>

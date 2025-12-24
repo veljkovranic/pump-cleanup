@@ -1,7 +1,7 @@
 /**
  * FAQ Page
  * 
- * Frequently Asked Questions about Wallet Cleanup and Solana rent.
+ * Frequently Asked Questions about PumpCleanup and Solana rent.
  */
 
 import Head from 'next/head';
@@ -156,7 +156,7 @@ export default function FAQPage() {
   return (
     <>
       <Head>
-        <title>FAQ - Wallet Cleanup</title>
+        <title>FAQ - PumpCleanup</title>
         <meta name="description" content="Frequently asked questions about recovering SOL from empty token accounts on Solana." />
       </Head>
 
@@ -167,11 +167,11 @@ export default function FAQPage() {
             <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all">
               <img 
                 src="/logo.svg" 
-                alt="Wallet Cleanup" 
+                alt="PumpCleanup" 
                 className="w-10 h-10 rounded-xl"
               />
               <span className="font-display text-xl font-bold text-white">
-                Wallet Cleanup
+                PumpCleanup
               </span>
             </Link>
             <nav className="flex items-center gap-6">
@@ -259,7 +259,7 @@ export default function FAQPage() {
         <footer className="py-8 px-4 border-t border-cleanup-border/50">
           <div className="max-w-6xl mx-auto text-center">
             <Link href="/" className="text-cleanup-text-secondary hover:text-white transition-colors text-sm">
-              ← Back to Wallet Cleanup
+              ← Back to PumpCleanup
             </Link>
           </div>
         </footer>

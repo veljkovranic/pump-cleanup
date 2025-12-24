@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { SessionStats as SessionStatsType } from '@/hooks/useDegenPrinter';
+import { SessionStats as SessionStatsType } from '@/hooks/usePumpCleanup';
 
 interface SessionStatsProps {
   stats: SessionStatsType;

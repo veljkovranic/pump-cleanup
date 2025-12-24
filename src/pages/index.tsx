@@ -1,5 +1,5 @@
 /**
- * Wallet Cleanup - Main Page
+ * PumpCleanup - Main Page
  * 
  * Professional landing page and dApp for reclaiming SOL from empty token accounts.
  * Design inspired by rpcfast.com for a clean, enterprise-grade look.
@@ -19,21 +19,21 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Wallet Cleanup - Reclaim SOL From Empty Token Accounts</title>
+        <title>PumpCleanup - Reclaim SOL From Empty Token Accounts</title>
         <meta name="description" content="Reclaim hidden SOL locked in empty token accounts on Solana. Clean your wallet and get your rent back instantly." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
         
         {/* Open Graph */}
-        <meta property="og:title" content="Wallet Cleanup - Reclaim SOL From Empty Token Accounts" />
+        <meta property="og:title" content="PumpCleanup - Reclaim SOL From Empty Token Accounts" />
         <meta property="og:description" content="Reclaim hidden SOL locked in empty token accounts on Solana. Clean your wallet and get your rent back instantly." />
-        <meta property="og:url" content="https://walletcleanup.com" />
+        <meta property="og:url" content="https://pumpcleanup.com" />
         <meta property="og:type" content="website" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@wallet_cleanup" />
-        <meta name="twitter:title" content="Wallet Cleanup - Reclaim SOL From Empty Token Accounts" />
+        <meta name="twitter:site" content="@pumpcleanup" />
+        <meta name="twitter:title" content="PumpCleanup - Reclaim SOL From Empty Token Accounts" />
         <meta name="twitter:description" content="Reclaim hidden SOL locked in empty token accounts on Solana." />
       </Head>
 
@@ -154,7 +154,7 @@ const FeaturesSection: React.FC = () => {
     <section className="w-full max-w-5xl mx-auto px-4 py-16">
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold font-display text-white mb-4">
-          Why Use Wallet Cleanup?
+          Why Use PumpCleanup?
         </h2>
         <p className="text-cleanup-text-secondary max-w-2xl mx-auto">
           Every token transaction on Solana creates accounts that lock SOL. Most users don&apos;t know they have hundreds of SOL worth of refunds waiting.

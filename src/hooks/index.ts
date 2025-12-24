@@ -7,13 +7,13 @@
 export { useWalletRentScanner } from './useWalletRentScanner';
 export type { ScanState, UseWalletRentScannerReturn } from './useWalletRentScanner';
 
-export { useDegenPrinter } from './useDegenPrinter';
+export { usePumpCleanup } from './usePumpCleanup';
 export type {
   PrintStatus,
   PrintProgress,
   PrintResult,
   SessionStats,
-  UseDegenPrinterReturn,
-} from './useDegenPrinter';
+  UsePumpCleanupReturn,
+} from './usePumpCleanup';
 
 

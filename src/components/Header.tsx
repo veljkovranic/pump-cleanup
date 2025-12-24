@@ -1,7 +1,7 @@
 /**
  * Header Component
  * 
- * Professional navigation header for Wallet Cleanup.
+ * Professional navigation header for PumpCleanup.
  */
 
 import React from 'react';
@@ -33,12 +33,12 @@ export const Header: React.FC = () => {
         >
           <img 
             src="/logo.svg" 
-            alt="Wallet Cleanup" 
+            alt="PumpCleanup" 
             className="w-10 h-10 rounded-xl"
           />
           <div className="flex flex-col">
             <h1 className="font-display text-xl font-bold text-white">
-              Wallet Cleanup
+              PumpCleanup
             </h1>
             <p className="text-xs text-cleanup-text-muted hidden sm:block">
               Click to disconnect

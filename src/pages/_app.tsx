@@ -1,5 +1,5 @@
 /**
- * Wallet Cleanup - App Root
+ * PumpCleanup - App Root
  * 
  * Sets up the Solana Wallet Adapter providers and global styles.
  */

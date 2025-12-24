@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { PrintProgress } from '@/hooks/useDegenPrinter';
+import { PrintProgress } from '@/hooks/usePumpCleanup';
 
 interface ProgressIndicatorProps {
   progress: PrintProgress;

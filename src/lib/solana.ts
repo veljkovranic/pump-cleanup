@@ -1,7 +1,7 @@
 /**
  * Solana Utility Module
  * 
- * This module provides core Solana functionality for DegenPrinter:
+ * This module provides core Solana functionality for PumpCleanup:
  * - Connection management
  * - Token account scanning
  * - Account closing transactions
@@ -175,7 +175,7 @@ export async function scanWalletForCloseableAccounts(
 ): Promise<ScanResult> {
   const connection = getConnection();
   
-  console.log(`%c[DegenPrinter] 🔍 Scanning wallet...`, 'color: #00ff88; font-weight: bold');
+  console.log(`%c[PumpCleanup] 🔍 Scanning wallet...`, 'color: #00ff88; font-weight: bold');
   
   const closeableAccounts: CloseableAccount[] = [];
   let totalAccountsFound = 0;
@@ -188,7 +188,7 @@ export async function scanWalletForCloseableAccounts(
   let allAccounts: any[] = [];
 
   if (dasAccounts && dasAccounts.length > 0) {
-    console.log(`[DegenPrinter] ✨ Using DAS API (1 call)`);
+    console.log(`[PumpCleanup] ✨ Using DAS API (1 call)`);
     // Transform DAS format to our format
     allAccounts = dasAccounts.map((acc: any) => ({
       pubkey: new PublicKey(acc.address),
@@ -212,7 +212,7 @@ export async function scanWalletForCloseableAccounts(
     }));
   } else {
     // Fallback: Standard RPC with parallel fetching
-    console.log(`[DegenPrinter] Using standard RPC (2 parallel calls)`);
+    console.log(`[PumpCleanup] Using standard RPC (2 parallel calls)`);
     const [splAccounts, token2022Accounts] = await Promise.all([
       connection.getParsedTokenAccountsByOwner(walletAddress, { programId: TOKEN_PROGRAM_ID }, 'confirmed')
         .catch(() => ({ value: [] })),
@@ -226,7 +226,7 @@ export async function scanWalletForCloseableAccounts(
     ];
   }
 
-  console.log(`[DegenPrinter] Found ${allAccounts.length} token accounts`);
+  console.log(`[PumpCleanup] Found ${allAccounts.length} token accounts`);
   totalAccountsFound = allAccounts.length;
 
   for (const { pubkey, account, programId } of allAccounts) {
@@ -302,16 +302,16 @@ export async function scanWalletForCloseableAccounts(
   const dustCount = truncatedAccounts.filter(a => a.isDust).length;
 
   console.log(`\n`);
-  console.log(`%c[DegenPrinter] ═══════════════════════════════════════`, 'color: #00ff88; font-weight: bold');
-  console.log(`%c[DegenPrinter] 📊 SCAN COMPLETE`, 'color: #00ff88; font-weight: bold');
-  console.log(`[DegenPrinter] Total accounts scanned: ${totalAccountsFound}`);
-  console.log(`[DegenPrinter] Closeable found: ${totalCloseableCount}${isTruncated ? ` (showing ${MAX_ACCOUNTS_TO_PROCESS})` : ''}`);
-  console.log(`[DegenPrinter] Empty: ${emptyCount} | Dust: ${dustCount}`);
-  console.log(`%c[DegenPrinter] Frozen: ${frozenAccounts}`, 'color: #3b82f6');
-  console.log(`[DegenPrinter] Skipped: ${skippedAccounts}`);
-  console.log(`[DegenPrinter] Total reclaimable: ${estimatedTotalSol.toFixed(4)} SOL`);
+  console.log(`%c[PumpCleanup] ═══════════════════════════════════════`, 'color: #00ff88; font-weight: bold');
+  console.log(`%c[PumpCleanup] 📊 SCAN COMPLETE`, 'color: #00ff88; font-weight: bold');
+  console.log(`[PumpCleanup] Total accounts scanned: ${totalAccountsFound}`);
+  console.log(`[PumpCleanup] Closeable found: ${totalCloseableCount}${isTruncated ? ` (showing ${MAX_ACCOUNTS_TO_PROCESS})` : ''}`);
+  console.log(`[PumpCleanup] Empty: ${emptyCount} | Dust: ${dustCount}`);
+  console.log(`%c[PumpCleanup] Frozen: ${frozenAccounts}`, 'color: #3b82f6');
+  console.log(`[PumpCleanup] Skipped: ${skippedAccounts}`);
+  console.log(`[PumpCleanup] Total reclaimable: ${estimatedTotalSol.toFixed(4)} SOL`);
   if (isTruncated) {
-    console.log(`%c[DegenPrinter] ⚠️ Results truncated to ${MAX_ACCOUNTS_TO_PROCESS} for performance`, 'color: #ff6b00');
+    console.log(`%c[PumpCleanup] ⚠️ Results truncated to ${MAX_ACCOUNTS_TO_PROCESS} for performance`, 'color: #ff6b00');
   }
   console.log(`\n`);
 

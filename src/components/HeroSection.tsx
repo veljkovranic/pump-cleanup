@@ -87,11 +87,11 @@ export const HeroSection: React.FC = () => {
           <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all">
             <img 
               src="/logo.svg" 
-              alt="Wallet Cleanup" 
+              alt="PumpCleanup" 
               className="w-10 h-10 rounded-xl"
             />
             <span className="font-display text-xl font-bold text-white">
-              Wallet Cleanup
+              PumpCleanup
             </span>
           </Link>
           <nav className="flex items-center gap-6">
