@@ -17,10 +17,13 @@ const WalletMultiButton = dynamic(
 export const Header: React.FC = () => {
   const { disconnect, connected } = useWallet();
 
-  const handleLogoClick = () => {
+  const handleLogoClick = async () => {
+    // Always disconnect first, then navigate
     if (connected) {
-      disconnect();
+      await disconnect();
     }
+    // Navigate to home page after disconnect completes
+    window.location.href = '/';
   };
 
   return (
@@ -29,15 +32,15 @@ export const Header: React.FC = () => {
         {/* Logo */}
         <button 
           onClick={handleLogoClick} 
-          className="flex items-center gap-3 text-left hover:opacity-80 transition-all group"
+          className="flex items-center gap-2 sm:gap-3 text-left hover:opacity-80 transition-all group"
         >
           <img 
             src="/logo.svg" 
             alt="PumpCleanup" 
-            className="w-10 h-10 rounded-xl"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl"
           />
           <div className="flex flex-col">
-            <h1 className="font-display text-xl font-bold text-white">
+            <h1 className="font-display text-lg sm:text-xl font-bold text-white">
               PumpCleanup
             </h1>
             <p className="text-xs text-cleanup-text-muted hidden sm:block">
@@ -46,21 +49,21 @@ export const Header: React.FC = () => {
           </div>
         </button>
 
-        {/* Nav + Wallet */}
-        <div className="flex items-center gap-6">
+        {/* Nav + Wallet - Blog/FAQ hidden on mobile/tablet */}
+        <div className="flex items-center gap-4 lg:gap-6">
           <Link 
             href="/blog" 
-            className="text-sm text-cleanup-text-secondary hover:text-white transition-colors hidden sm:block"
+            className="text-sm text-cleanup-text-secondary hover:text-white transition-colors hidden lg:block"
           >
             Blog
           </Link>
           <Link 
             href="/faq" 
-            className="text-sm text-cleanup-text-secondary hover:text-white transition-colors hidden sm:block"
+            className="text-sm text-cleanup-text-secondary hover:text-white transition-colors hidden lg:block"
           >
             FAQ
           </Link>
-          <WalletMultiButton className="!bg-cleanup-card !border !border-cleanup-border !rounded-xl !py-2.5 !px-5 !text-white hover:!bg-cleanup-hover hover:!border-cleanup-primary !transition-all !font-medium !text-sm" />
+          <WalletMultiButton className="!bg-cleanup-card !border !border-cleanup-border !rounded-xl !py-2 !px-3 lg:!py-2.5 lg:!px-5 !text-white hover:!bg-cleanup-hover hover:!border-cleanup-primary !transition-all !font-medium !text-xs lg:!text-sm" />
         </div>
       </div>
     </header>

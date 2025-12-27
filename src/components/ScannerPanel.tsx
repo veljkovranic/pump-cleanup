@@ -279,29 +279,30 @@ export const ScannerPanel: React.FC = () => {
 
           {/* Scan Results */}
           {hasScanned && !scanError && !isScanning && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Stats Cards */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-cleanup-card border border-cleanup-border rounded-xl p-5">
-                  <p className="text-cleanup-text-muted text-xs uppercase tracking-wide mb-2">Wallet Balance</p>
-                  <p className="text-2xl font-bold font-display text-white">
-                    {solBalance !== null ? `${solBalance.toFixed(5)}` : '...'}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
+                <div className="bg-cleanup-card border border-cleanup-border rounded-xl p-3 sm:p-5 overflow-hidden">
+                  <p className="text-cleanup-text-muted text-[10px] sm:text-xs uppercase tracking-wide mb-1 sm:mb-2">Balance</p>
+                  <p className="text-lg sm:text-2xl font-bold font-display text-white truncate">
+                    {solBalance !== null ? `${solBalance.toFixed(4)}` : '...'}
                   </p>
-                  <p className="text-cleanup-text-muted text-xs">SOL</p>
+                  <p className="text-cleanup-text-muted text-[10px] sm:text-xs">SOL</p>
                 </div>
-                <div className="bg-cleanup-card border border-cleanup-border rounded-xl p-5">
-                  <p className="text-cleanup-text-muted text-xs uppercase tracking-wide mb-2">Recoverable</p>
-                  <p className="text-2xl font-bold font-display text-cleanup-secondary">
-                    {(emptyTotalSol * (1 - FEE_PERCENTAGE)).toFixed(5)}
+                <div className="bg-cleanup-card border border-cleanup-border rounded-xl p-3 sm:p-5 overflow-hidden">
+                  <p className="text-cleanup-text-muted text-[10px] sm:text-xs uppercase tracking-wide mb-1 sm:mb-2">Recoverable</p>
+                  <p className="text-lg sm:text-2xl font-bold font-display text-cleanup-secondary truncate">
+                    {(emptyTotalSol * (1 - FEE_PERCENTAGE)).toFixed(4)}
                   </p>
-                  <p className="text-cleanup-text-muted text-xs">SOL</p>
+                  <p className="text-cleanup-text-muted text-[10px] sm:text-xs">SOL</p>
                 </div>
-                <div className="bg-cleanup-card border border-cleanup-border rounded-xl p-5">
-                  <p className="text-cleanup-text-muted text-xs uppercase tracking-wide mb-2">Accounts</p>
-                  <p className="text-2xl font-bold font-display text-white">
+                {/* Hide accounts count on mobile */}
+                <div className="hidden sm:block bg-cleanup-card border border-cleanup-border rounded-xl p-3 sm:p-5">
+                  <p className="text-cleanup-text-muted text-[10px] sm:text-xs uppercase tracking-wide mb-1 sm:mb-2">Accounts</p>
+                  <p className="text-lg sm:text-2xl font-bold font-display text-white">
                     {emptyAccounts.length}
                   </p>
-                  <p className="text-cleanup-text-muted text-xs">to close</p>
+                  <p className="text-cleanup-text-muted text-[10px] sm:text-xs">to close</p>
                 </div>
               </div>
 

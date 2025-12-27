@@ -84,30 +84,30 @@ export const HeroSection: React.FC = () => {
       {/* Landing Page Header */}
       <header className="w-full py-4 px-4 md:px-8 border-b border-cleanup-border/50 backdrop-blur-xl bg-cleanup-dark/90 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-all">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-all">
             <img 
               src="/logo.svg" 
               alt="PumpCleanup" 
-              className="w-10 h-10 rounded-xl"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl"
             />
-            <span className="font-display text-xl font-bold text-white">
+            <span className="font-display text-lg sm:text-xl font-bold text-white">
               PumpCleanup
             </span>
           </Link>
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-4 lg:gap-6">
             <Link 
               href="/blog" 
-              className="text-sm text-cleanup-text-secondary hover:text-white transition-colors"
+              className="text-sm text-cleanup-text-secondary hover:text-white transition-colors hidden lg:block"
             >
               Blog
             </Link>
             <Link 
               href="/faq" 
-              className="text-sm text-cleanup-text-secondary hover:text-white transition-colors"
+              className="text-sm text-cleanup-text-secondary hover:text-white transition-colors hidden lg:block"
             >
               FAQ
             </Link>
-            <WalletMultiButton className="!bg-cleanup-card !border !border-cleanup-border !rounded-xl !py-2.5 !px-5 !text-white hover:!bg-cleanup-hover hover:!border-cleanup-primary !transition-all !font-medium !text-sm" />
+            <WalletMultiButton className="!bg-cleanup-card !border !border-cleanup-border !rounded-xl !py-2 !px-3 lg:!py-2.5 lg:!px-5 !text-white hover:!bg-cleanup-hover hover:!border-cleanup-primary !transition-all !font-medium !text-xs lg:!text-sm" />
           </nav>
         </div>
       </header>
