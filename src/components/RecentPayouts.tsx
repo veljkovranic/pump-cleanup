@@ -2,14 +2,11 @@
  * RecentPayouts Component
  * 
  * Displays recent successful cleanups from users.
- * Professional table design with clean styling.
+ * Fetches data from the backend API cache.
  */
 
 import React, { useState, useEffect } from 'react';
 import { shortenAddress } from '@/lib/solana';
-
-// Fee wallet address
-const FEE_WALLET = '33fRYeecEUKWoeyfmQxgkGHaDgy8sAJgUsmdgikMpNJ4';
 
 interface PayoutEntry {
   wallet: string;
@@ -19,20 +16,31 @@ interface PayoutEntry {
   date: Date;
 }
 
-// ============================================================================
-// GLOBAL CACHE
-// ============================================================================
-let cachedPayouts: PayoutEntry[] | null = null;
-let cacheTimestamp: number = 0;
-let fetchPromise: Promise<PayoutEntry[]> | null = null;
-const CACHE_TTL = 10 * 60 * 1000;
-
-export function getCachedTotalSolReclaimed(): number {
-  if (!cachedPayouts) return 0;
-  return cachedPayouts.reduce((sum, p) => sum + (p.reward * 10 / 9), 0);
+interface ApiPayoutEntry {
+  wallet: string;
+  accountsClosed: number;
+  reward: number;
+  signature: string;
+  timestamp: number;
 }
 
-async function fetchPayoutsOnce(rpcEndpoint: string): Promise<PayoutEntry[]> {
+// ============================================================================
+// GLOBAL CACHE (fallback + local cache of API response)
+// ============================================================================
+let cachedPayouts: PayoutEntry[] | null = null;
+let cachedTotalSol: number = 0;
+let cacheTimestamp: number = 0;
+let fetchPromise: Promise<PayoutEntry[]> | null = null;
+const CACHE_TTL = 60 * 1000; // 1 minute local cache
+
+// Backend API URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+export function getCachedTotalSolReclaimed(): number {
+  return cachedTotalSol;
+}
+
+async function fetchPayoutsFromApi(): Promise<PayoutEntry[]> {
   if (cachedPayouts && (Date.now() - cacheTimestamp) < CACHE_TTL) {
     return cachedPayouts;
   }
@@ -43,94 +51,35 @@ async function fetchPayoutsOnce(rpcEndpoint: string): Promise<PayoutEntry[]> {
 
   fetchPromise = (async () => {
     try {
-      const sigResponse = await fetch(rpcEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 'sigs',
-          method: 'getSignaturesForAddress',
-          params: [FEE_WALLET, { limit: 15 }],
-        }),
-      });
-
-      const sigData = await sigResponse.json();
-      const signatures = sigData.result || [];
-
-      if (signatures.length === 0) {
-        cachedPayouts = [];
-        cacheTimestamp = Date.now();
-        return [];
+      const response = await fetch(`${API_URL}/api/recent-cleanups`);
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
       }
 
-      const batchRequests = signatures.map((s: any, idx: number) => ({
-        jsonrpc: '2.0',
-        id: `tx-${idx}`,
-        method: 'getTransaction',
-        params: [
-          s.signature,
-          { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 },
-        ],
+      const json = await response.json();
+      
+      if (!json.success || !json.data) {
+        throw new Error('Invalid API response');
+      }
+
+      const payouts: PayoutEntry[] = json.data.payouts.map((p: ApiPayoutEntry) => ({
+        wallet: p.wallet,
+        accountsClosed: p.accountsClosed,
+        reward: p.reward,
+        signature: p.signature,
+        date: new Date(p.timestamp * 1000),
       }));
 
-      const txResponse = await fetch(rpcEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(batchRequests),
-      });
-
-      const txData = await txResponse.json();
-      const transactions = Array.isArray(txData) 
-        ? txData.map((r: any) => r.result) 
-        : [];
-
-      const parsedPayouts: PayoutEntry[] = [];
-
-      for (let i = 0; i < transactions.length; i++) {
-        const tx = transactions[i];
-        const sig = signatures[i];
-        
-        if (!tx || !tx.meta || tx.meta.err) continue;
-
-        try {
-          const preBalances = tx.meta.preBalances;
-          const postBalances = tx.meta.postBalances;
-          const accountKeys = tx.transaction.message.accountKeys;
-
-          const accountAddresses: string[] = accountKeys.map((key: any) => {
-            if (key.pubkey) {
-              return typeof key.pubkey === 'string' ? key.pubkey : key.pubkey.toString();
-            }
-            return typeof key === 'string' ? key : key.toString();
-          });
-
-          const feeWalletIndex = accountAddresses.findIndex(addr => addr === FEE_WALLET);
-          if (feeWalletIndex === -1) continue;
-
-          const balanceDiff = postBalances[feeWalletIndex] - preBalances[feeWalletIndex];
-          if (balanceDiff <= 0) continue;
-
-          const sender = accountAddresses[0];
-          const feeReceived = balanceDiff / 1e9;
-          const userReceived = feeReceived * 9;
-          const rentPerAccount = 0.00204;
-          const estimatedAccounts = Math.max(1, Math.round(userReceived / 0.9 / rentPerAccount));
-
-          parsedPayouts.push({
-            wallet: sender,
-            accountsClosed: estimatedAccounts,
-            reward: userReceived,
-            signature: sig.signature,
-            date: new Date((sig.blockTime || 0) * 1000),
-          });
-        } catch (e) {
-          // Skip malformed transaction
-        }
-      }
-
-      cachedPayouts = parsedPayouts;
+      cachedPayouts = payouts;
+      cachedTotalSol = json.data.totalSolReclaimed || 0;
       cacheTimestamp = Date.now();
-      return parsedPayouts;
+
+      return payouts;
+    } catch (error) {
+      console.error('[RecentPayouts] API fetch failed:', error);
+      // Return cached data if available, otherwise empty
+      return cachedPayouts || [];
     } finally {
       fetchPromise = null;
     }
@@ -149,15 +98,13 @@ export const RecentPayouts: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const rpcEndpoint = process.env.NEXT_PUBLIC_RPC_ENDPOINT || 'https://api.mainnet-beta.solana.com';
-    
     if (cachedPayouts && (Date.now() - cacheTimestamp) < CACHE_TTL) {
       setPayouts(cachedPayouts);
       setLoading(false);
       return;
     }
 
-    fetchPayoutsOnce(rpcEndpoint)
+    fetchPayoutsFromApi()
       .then(data => {
         setPayouts(data);
         setLoading(false);
@@ -205,7 +152,7 @@ export const RecentPayouts: React.FC = () => {
     console.error('RecentPayouts error:', error);
   }
 
-  const totalSolReclaimed = payouts.reduce((sum, p) => sum + (p.reward * 10 / 9), 0);
+  const totalSolReclaimed = payouts.reduce((sum, p) => sum + (p.reward), 0);
 
   return (
     <section className="w-full max-w-4xl mx-auto px-4 py-8">
