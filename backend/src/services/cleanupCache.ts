@@ -67,7 +67,7 @@ async function fetchRecentCleanups(): Promise<PayoutEntry[]> {
       }),
     });
 
-    const sigData = await sigResponse.json();
+    const sigData = await sigResponse.json() as { error?: any; result?: any[] };
     
     // Debug: log raw response
     if (sigData.error) {
@@ -100,7 +100,7 @@ async function fetchRecentCleanups(): Promise<PayoutEntry[]> {
       body: JSON.stringify(batchRequests),
     });
 
-    const txData = await txResponse.json();
+    const txData = await txResponse.json() as any;
     const transactions = Array.isArray(txData) 
       ? txData.map((r: any) => r.result) 
       : [];
@@ -222,4 +222,3 @@ export function refreshCacheInBackground(): void {
     fetchPromise = null;
   });
 }
-
